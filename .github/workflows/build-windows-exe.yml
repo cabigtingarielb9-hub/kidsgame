@@ -1,0 +1,57 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-exe:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create Electron Fullscreen Entry
+        run: |
+          @"
+          const { app, BrowserWindow } = require('electron');
+
+          function createWindow() {
+            const win = new BrowserWindow({
+              fullscreen: true,
+              autoHideMenuBar: true,
+              icon: __dirname + '/icon.png',
+              webPreferences: {
+                nodeIntegration: false,
+                contextIsolation: true
+              }
+            });
+
+            win.loadURL('https://quuenygames-bytitoyel.base44.app');
+          }
+
+          app.whenReady().then(createWindow);
+
+          app.on('window-all-closed', () => {
+            if (process.platform !== 'darwin') app.quit();
+          });
+          "@ | Out-File -FilePath electron-main.js -Encoding utf8
+
+      - name: Build Windows Executable
+        run: npx electron-builder --win portable
+
+      - name: Upload EXE Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Queen-Nenita-Games-Windows
+          path: dist/*.exe
