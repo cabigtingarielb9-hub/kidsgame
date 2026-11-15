@@ -1,0 +1,12 @@
+{
+  "appId": "com.titoyel.queennenita",
+  "appName": "Queen Nenita Games",
+  "webDir": "www",
+  "server": {
+    "url": "https://quuenygames-bytitoyel.base44.app",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}
